@@ -5,7 +5,16 @@ A bot for detecting when concerts and festival tickets are sold out.
 
 ## Installation
 Follows those steps :
+
 - Install python. This bot works at least in python version 3.9.7 so I suggest you to install this version. You can download it [here](https://www.python.org/downloads/release/python-397/). For Windows users, use the 'Windows installer (64-bit)' installer in the bottom of the page.
+
+- Clone this Git repository at the location where you want the project to be, and go into it :
+
+    ```bash
+    git clone https://github.com/Thomas-Schatz/Sold-out-Tickets-Detector.git
+    cd Sold-out-Tickets-Detector
+    ```
+    
 - Assert you are using the good python version. If not, you would have to replace 'python' by the path to the python 3.9.7 executable in the next command (but not for the other commands, since you will already be placed in the good python environment):
     
     ```bash

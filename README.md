@@ -11,7 +11,7 @@ Follows those steps :
 - Clone this Git repository at the location where you want the project to be, and go into it :
 
     ```bash
-    git clone https://github.com/Thomas-Schatz/Sold-out-Tickets-Detector.git
+    git clone https://github.com/tboulet/Sold-out-Tickets-Detector.git
     cd Sold-out-Tickets-Detector
     ```
     

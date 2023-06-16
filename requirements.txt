@@ -1,1 +1,4 @@
 selenium==4.9.1
+python-telegram-bot==13.13
+telegram==0.0.1
+python-dotenv==1.0.0

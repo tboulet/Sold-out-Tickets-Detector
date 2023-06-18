@@ -7,6 +7,11 @@ from selenium.common.exceptions import NoSuchElementException
 
 
 
+def get_driver():
+    return webdriver.Firefox("driver")
+
+
+
 class SoldoutDetector(ABC):
     def __init__(self) -> None:
         super().__init__()

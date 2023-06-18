@@ -1,37 +1,62 @@
 # Sold-out-Tickets-Detector
-A bot for detecting when concerts and festival tickets are sold out.
+A bot to detect when tickets (festivals, concerts...) are sold out and send an alert.
 
-# Use the MVP script
+You can add tickets to a watchlist.
+<p align="center">
+  <img src="assets/add_ticket_to_watchlist.png" alt="Title" width="60%"/>
+</p>
+
+The bot will regularly check if any ticket in the watchlist is sold out. If so, it will send an alert to the chat ID.
+<p align="center">
+  <img src="assets/ticket_is_soldout.png" alt="Title" width="60%"/>
+</p>
+
+The bot runs with python. It uses the [Telegram API](https://docs.python-telegram-bot.org/en/stable/) for the bot interface, [Selenium](https://selenium-python.readthedocs.io) for web scraping and [SQlite](https://www.sqlite.org/index.html) for the database.
 
 ## Installation
-Follows those steps :
 
-- Install python. This bot works at least in python version 3.9.7 so I suggest you to install this version. You can download it [here](https://www.python.org/downloads/release/python-397/). For Windows users, use the 'Windows installer (64-bit)' installer in the bottom of the page.
+The bot works at least on Windows 10 and 11. It is not tested on Linux.
 
+### Prerequisites :
+
+- git
+- python (the bot works at least in version 3.9.7, probably work with other versions too)
+- mozilla firefox (if you hate this browser you can try modify the function `src.web_scraping.get_driver`)
+- a Telegram bot, along with its token (see https://core.telegram.org/bots#6-botfather) that is admnistrator on a chat.
+
+Installation :
 - Clone this Git repository at the location where you want the project to be, and go into it :
 
     ```bash
     git clone https://github.com/tboulet/Sold-out-Tickets-Detector.git
     cd Sold-out-Tickets-Detector
     ```
-    
-- Assert you are using the good python version. If not, you would have to replace 'python' by the path to the python 3.9.7 executable in the next command (but not for the other commands, since you will already be placed in the good python environment):
-    
-    ```bash
-    python --version
+
+- Create a Telegram bot (see https://core.telegram.org/bots#6-botfather), create a group chat with it and add it as administrator. You can also use an existing group chat, but you will need to add the bot as administrator. Please not that all members of the group can interact with the bot which include adding and removing tickets from the watchlist.
+
+- Create a file `.env` and add your credientials. An example is available in the file `.env_template` :
     ```
+    BOT_TOKEN=123456789:ABCD-EFGHIJKLMNOPQRSTUV
+    CHAT_ID=123456789
+    ```
+    You can copy paste this file, rename it `.env` and change your IDs.
+    
+    The bot token is given to you by @BotFather on Telegram when you create the bot.
+
+    The chat ID is the ID of the chat where you can interact with the bot. For obtaining it, you can either try to run this bot with a dummy chat ID (such as 123456789) and try to use the bot (it will answer you the chat ID in Telegram) or use a bot such as @myidbot on Telegram.
 
 - Create a python virtual environment for the project and activate it :
 
+    If the 'python' command doesn't work after installing python, try 'python3' or 'py'.
     ```bash
     python -m venv venv
     venv\Scripts\activate  # use this command on windows
     source venv/bin/activate  # use this command on linux
     ```
-    You should see '(venv)' at the beginning of your command line now. This means you are placed in the virtual environment used for this project. You can deactivate it with the command 'deactivate', but for when you are using the project, please stay in this virtual environment.
+    You should see '(venv)' at the beginning of your command line now. This means you are placed in the virtual environment used for this project. You can deactivate it with the command 'deactivate', but when you are using the project, please stay in this virtual environment.
 
 
-- Install the required libraries :
+- Install the required python libraries :
     
     ```bash
     pip install -r requirements.txt
@@ -39,19 +64,24 @@ Follows those steps :
 
 ## Usage
 
-Use this command for evaluating whether the ticket of the url is working :
-    
-```bash
-python is_soldout.py <the_ticket_url>
+For starting the bot on a certain machine, simply run :
 ```
-
-For example, this should print 'True' in the console :
-
-```bash
-python is_soldout.py https://concerts.livenation.com/don-toliver-thee-love-sick-tour-houston-texas-07-08-2023/event/3A005E7D223A7CD8?
+python run.py
 ```
+The bot will connect to the Telegram bot, and will be ready to receive commands.
 
-Note :
-- The command only works with webticket urls
-- The command (probably) only works with urls of the form 'https://www.ticketweb.com/event/event_name/0123456789'. The criteria is the url must lead to a page with a "ticket" section. This is not verified and possibly unstable.
-- This simple script should in the future evolve to a bot that tracks the ticket availability of registered urls and sends an notification when the ticket is sold out.
+Main commands are :
+- /help : list the available commands
+- /watch [url1] [url2] ... : add tickets to the watchlist
+- /unwatch [url1] [url2] ... : remove tickets from the watchlist
+- /status : display the status of the bot
+- /list : list all the tickets in the watchlist
+- /check [url] : check if a ticket in the watchlist is sold out
+- /reset_db : reset the database (all tickets are removed from the watchlist)
+
+Every checking_frequency seconds (a parameter that can be modified with the /set command), the bot will check if any ticket in the watchlist is sold out. If so, it will send an alert to the chat ID.
+
+Note and improvements :
+- For each site, the criteria is that the url must lead to a page with a certain HTML tag that will be detected as proof of sold-out or not-sold-out. This is not verified and possibly unstable depending on the websites.
+- I would like the bot to be able to have a /update command, which stop the program, pull the code from github and restart the program.
+- More generally, the bot can be extended to any purpose for monitoring a certain event taking place on a website, as long as this event is detectable by a change in the HTML code.

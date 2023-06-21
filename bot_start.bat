@@ -1,1 +1,2 @@
-cmd /k python run.py
+venv\Scripts\activate
+cmd /k py run.py

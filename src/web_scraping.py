@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from webdriver_manager.firefox import GeckoDriverManager
 import argparse
 from selenium.common.exceptions import NoSuchElementException
-
+from bs4 import BeautifulSoup
 
 
 def get_driver():
@@ -13,13 +13,22 @@ def get_driver():
 
 
 class SoldoutDetector(ABC):
+    """Abstract class for soldout detectors"""
     def __init__(self) -> None:
         super().__init__()
     @abstractmethod
     def get_name(self):
+        """Get the name of the soldout detector
+        """
         raise NotImplementedError("Please Implement this method")
     @abstractmethod
     def is_soldout(self, url : str, driver : webdriver.Firefox):
+        """Return True if the event is soldout, False otherwise
+
+        Args:
+            url (str): the url of the event
+            driver (webdriver.Firefox): the webdriver to use
+        """
         raise NotImplementedError("Please Implement this method")
 
 
@@ -45,8 +54,9 @@ class SeeTicketsSoldoutDetector(SoldoutDetector):
     
     def is_soldout(self, url: str, driver: webdriver.Firefox):
         driver.get(url)
+
         try:
-            driver.find_element(By.ID, "addtomyorder")
+            driver.find_element(By.ID, "eventview")
             return False
         except NoSuchElementException:
             return True

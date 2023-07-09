@@ -27,7 +27,7 @@ command_signature_to_description : Dict[str, str] = {
     "/watch <url1> <url2> ..." : "Add one or more tickets' urls to the watchlist",
     "/unwatch <url1> <url2> ..." : "Remove one or more tickets' urls from the watchlist",
     "/list [n]" : "List the n last tickets that were watched (list all tickets if n not specified)",
-    "/check <url>" : "Check instantly if the ticket is watched and if it is soldout",
+    "/check <url1> <url2> ..." : "Check the availability of one or more tickets' urls",
     "/set <parameter name> <value>" : "Set a parameter to a new value",
     "/get <parameter name>" : "Get the value of a parameter",
     "/status" : "Get the status of the bot",

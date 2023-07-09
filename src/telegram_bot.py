@@ -259,37 +259,47 @@ class TelegramBot():
 
     @command_execution_method
     def execute_check(self, update : Update, context : CallbackContext):
-        """Check if a ticket is in the watchlist and if it is sold out or not."""
+        """Check if one or several tickets are in the watch list and if they are sold out."""
         message_text = update.message.text
         command_signature, *args = message_text.split()
-        if len(args) != 1:
-            update.message.reply_text("Error : Invalid number of arguments (should be exactly 1)", disable_web_page_preview=True)
+        if len(args) == 0:
+            update.message.reply_text("Error : Invalid number of arguments (should be at least 1)", disable_web_page_preview=True)
             return
         
-        ticket_url = args[0]
-        answer = ""
-        # Check if ticket is in watch list
-        if not self.is_ticket_existing(ticket_url):
-            answer += f"Ticket is NOT in watch list.\n"
-        else:
-            answer += f"Ticket is in watch list.\n"
-        
-        detector = url_to_detector(ticket_url)
-        # Check if url's associated site is detected
-        if detector is None:
-            answer += f"Error : Site not detected for ticket {ticket_url}.\n"
-            update.message.reply_text(answer, disable_web_page_preview=True)
-            return
-        # Check if ticket is sold out or not
-        try:
-            if detector.is_soldout(url=ticket_url, driver=self.driver):
-                answer += f"Ticket is sold out :(\n"
+        waiting_message = f"Checking presence in watchlist and soldout status of {len(args)} tickets..."
+        update.message.reply_text(waiting_message, disable_web_page_preview=True)
+
+        answer_message = ""
+        for ticket_url in args:
+            ticket_line = f"Ticket {ticket_url} :\n"
+
+            # Check if ticket is in watch list
+            if self.is_ticket_existing(ticket_url):
+                ticket_line += "In watchlist : Yes, "
             else:
-                answer += f"Ticket is not sold out !\n"
-        except Exception as e:
-            answer += f"Error : Exception while checking ticket {ticket_url} : {e}\n"
-        
-        update.message.reply_text(answer, disable_web_page_preview=True)
+                ticket_line += "In watchlist : No,  "
+                
+            # Check ticket status
+            detector = url_to_detector(ticket_url)
+            if detector is None:
+                # Case 1 : site not detected
+                ticket_line += "Status : site not detected."
+
+            else:
+                ticket_line += f"Site : {detector.get_name()}, "
+                try:
+                    if detector.is_soldout(url=ticket_url, driver=self.driver):
+                        # Case 2 : sold out
+                        ticket_line += "Status : sold out."
+                    else:
+                        # Case 3 : available
+                        ticket_line += "Status : available."
+                except Exception as e:
+                    # Case 4 : error during check
+                    ticket_line += f"Status : error : {e}"
+
+            answer_message += ticket_line + "\n\n"
+        update.message.reply_text(answer_message, disable_web_page_preview=True)
             
 
 

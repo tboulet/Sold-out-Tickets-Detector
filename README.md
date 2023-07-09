@@ -13,6 +13,11 @@ The bot will regularly check if any ticket in the watchlist is sold out. If so, 
 
 The bot runs with python. It uses the [Telegram API](https://docs.python-telegram-bot.org/en/stable/) for the bot interface, [Selenium](https://selenium-python.readthedocs.io) for web scraping and [SQlite](https://www.sqlite.org/index.html) for the database.
 
+Currently supported ticket websites are :
+- TicketWeb
+- SeeTickets
+- Etix
+
 ## Installation
 
 The bot works at least on Windows 10 and 11. It is not tested on Linux.
@@ -64,7 +69,17 @@ Installation :
 
 ## Usage
 
-For starting the bot on a certain machine, simply run :
+### Update the code
+To get the latest version of the bot, you can simply pull the code from github :
+```bash
+git pull
+```
+Or, you can also execute (double click) the file `bot_update.bat` if you are on windows.
+
+### Start the bot
+For starting the bot on windows, execute the file `bot_start.bat`. This will start the bot in a new terminal window. 
+
+For starting the bot from the CLI, simply run :
 ```
 python run.py
 ```
@@ -76,12 +91,16 @@ Main commands are :
 - /unwatch [url1] [url2] ... : remove tickets from the watchlist
 - /status : display the status of the bot
 - /list : list all the tickets in the watchlist
-- /check [url] : check if a ticket in the watchlist is sold out
+- /check [url1] [url2] ... : check tickets status and presence in watchlist
 - /reset_db : reset the database (all tickets are removed from the watchlist)
 
 Every checking_frequency seconds (a parameter that can be modified with the /set command), the bot will check if any ticket in the watchlist is sold out. If so, it will send an alert to the chat ID.
 
-Note and improvements :
+### Closing the bot
+
+For closing the bot, you can simply close the terminal window, or interupt the program with Ctrl+C if you want to keep your terminal open.
+
+### Note and improvements :
 - For each site, the criteria is that the url must lead to a page with a certain HTML tag that will be detected as proof of sold-out or not-sold-out. This is not verified and possibly unstable depending on the websites.
 - I would like the bot to be able to have a /update command, which stop the program, pull the code from github and restart the program.
 - More generally, the bot can be extended to any purpose for monitoring a certain event taking place on a website, as long as this event is detectable by a change in the HTML code.

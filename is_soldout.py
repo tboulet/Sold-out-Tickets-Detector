@@ -1,18 +1,8 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from webdriver_manager.firefox import GeckoDriverManager
 import argparse
 
+from selenium import webdriver
 
-
-def is_sold_out_ticketweb(url : str, driver : webdriver.Firefox):
-    print("Checking whether tickets are sold out on Ticketweb...")
-    driver.get(url)
-    try:
-        driver.find_element(By.ID, "edp-section-tickets-heading")
-        return False
-    except:
-        return True
+from src.web_scraping import url_to_detector
     
     
 
@@ -28,4 +18,13 @@ if __name__ == "__main__":
     driver = webdriver.Firefox("driver")
 
     # Check if sold out
-    print(is_sold_out_ticketweb(url, driver))
+    detector = url_to_detector(url)
+    if detector is None:
+        print("Site not recognized")
+
+    else:
+        print(f"Site detected : {detector.get_name()}")
+        if detector.is_soldout(url, driver):
+            print("Status : sold out")
+        else:
+            print("Status : available")

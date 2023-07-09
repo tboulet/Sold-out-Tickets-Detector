@@ -19,10 +19,14 @@ class DBInterface:
                 self.commit()
 
     def create_tables(self):
+        # Create empty ticket table
         self.execute('''CREATE TABLE IF NOT EXISTS tickets_url
                 (url TEXT PRIMARY KEY)''')
+        # Create parameters table and add the default values
         self.execute('''CREATE TABLE IF NOT EXISTS parameters
                 (name TEXT PRIMARY KEY, value TEXT)''')
+        for name, value in DEFAULT_VALUES.items():
+            self.execute(f"INSERT OR IGNORE INTO parameters (name, value) VALUES ('{name}', '{value}')")
         self.commit()
 
     def remove_tables(self):

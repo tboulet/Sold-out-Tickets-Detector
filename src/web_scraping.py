@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from webdriver_manager.firefox import GeckoDriverManager
@@ -10,7 +11,17 @@ from bs4 import BeautifulSoup
 def get_driver():
     return webdriver.Firefox("driver")
 
-
+def is_in_url_classes(
+    url: str, 
+    element: Any, 
+    driver: webdriver.Firefox
+):
+    driver.get(url)
+    page_source = driver.page_source
+    soup = BeautifulSoup(page_source, "html.parser")
+    tags = soup.find_all(class_=True)
+    classes = [tag["class"] for tag in tags]
+    return element in classes
 
 class SoldoutDetector(ABC):
     """Abstract class for soldout detectors"""
@@ -53,13 +64,11 @@ class SeeTicketsSoldoutDetector(SoldoutDetector):
         return "SeeTickets"
     
     def is_soldout(self, url: str, driver: webdriver.Firefox):
-        driver.get(url)
-
-        try:
-            driver.find_element(By.ID, "eventview")
-            return False
-        except NoSuchElementException:
-            return True
+        return is_in_url_classes(
+            url=url,
+            element = ['checkout-button', 'lrg-btn', 'float-r', 'm-r-5'],
+            driver=driver,
+        )
 
 
 

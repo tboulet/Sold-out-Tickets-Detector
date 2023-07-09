@@ -1,6 +1,7 @@
 # Project related
 perso_*
 database.db
+data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

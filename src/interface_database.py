@@ -1,5 +1,5 @@
 import sqlite3
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from src.config import DEFAULT_VALUES
 DATABASE_PATH = "database.db"
 
@@ -15,7 +15,7 @@ class DBInterface:
         for parameter_name, default_parameter_value in DEFAULT_VALUES.items():
             assert type(default_parameter_value) == str, f"Default value of parameter {parameter_name} is not a string in the config file."
             if self.get_parameter_from_db(parameter_name) is None:
-                self.execute(f"INSERT INTO parameters (name, value) VALUES ('{parameter_name}', '{default_parameter_value}')")
+                self.execute(f"INSERT INTO parameters (name, value) VALUES (?, ?)", (parameter_name, default_parameter_value))
                 self.commit()
 
     def create_tables(self):
@@ -26,7 +26,7 @@ class DBInterface:
         self.execute('''CREATE TABLE IF NOT EXISTS parameters
                 (name TEXT PRIMARY KEY, value TEXT)''')
         for name, value in DEFAULT_VALUES.items():
-            self.execute(f"INSERT OR IGNORE INTO parameters (name, value) VALUES ('{name}', '{value}')")
+            self.execute(f"INSERT OR IGNORE INTO parameters (name, value) VALUES (?, ?)", (name, value))
         self.commit()
 
     def remove_tables(self):
@@ -43,7 +43,7 @@ class DBInterface:
         Returns:
             str: the parameter value, as a string, or None, if the parameter is not found
         """
-        self.execute(f"SELECT value FROM parameters WHERE name = '{parameter_name}'")
+        self.execute(f"SELECT value FROM parameters WHERE name = ?", (parameter_name,))
         list_of_rows_with_correct_name = self.fetchall()
         if len(list_of_rows_with_correct_name) == 0:
             return None
@@ -58,7 +58,7 @@ class DBInterface:
             parameter_name (str): the name of the parameter
             parameter_value (str): the new value of the parameter, as a string
         """
-        self.execute(f"UPDATE parameters SET value = '{parameter_value}' WHERE name = '{parameter_name}'")
+        self.execute(f"UPDATE parameters SET value = ? WHERE name = ?", (parameter_value, parameter_name))
         self.commit()
 
     def is_ticket_existing(self, ticket_url : str) -> bool:
@@ -70,7 +70,7 @@ class DBInterface:
         Returns:
             bool: whether the ticket is already in the watch list
         """
-        self.execute(f"SELECT url FROM tickets_url WHERE url = '{ticket_url}'")
+        self.execute(f"SELECT url FROM tickets_url WHERE url = ?", (ticket_url,))
         list_of_rows_with_correct_url = self.fetchall()
         if len(list_of_rows_with_correct_url) == 0:
             return False
@@ -101,8 +101,8 @@ class DBInterface:
         self.cursor.close()
         self.conn.close()
 
-    def execute(self, query : str):
-        self.cursor.execute(query)
+    def execute(self, query : str, parameters : Tuple[str] = ()):
+        self.cursor.execute(query, parameters)
 
     def commit(self):
         self.conn.commit()

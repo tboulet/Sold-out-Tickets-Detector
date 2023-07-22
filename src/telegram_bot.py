@@ -119,7 +119,7 @@ class TelegramBot():
                                 print(f"Ticket {ticket_url} is sold out !")
                                 self.updater.bot.send_message(chat_id=CHAT_ID, text=f"Ticket {ticket_url} is sold out !", disable_web_page_preview=True)
                                 # Remove ticket from watch list
-                                self.db_interface.execute(f"DELETE FROM tickets_url WHERE url = '{ticket_url}'")
+                                self.db_interface.execute(f"DELETE FROM tickets_url WHERE url = ?", (ticket_url,))
                                 self.db_interface.commit()
                         except Exception as e:
                             print(f"Error : Exception while checking ticket {ticket_url} : {e}")
@@ -225,7 +225,7 @@ class TelegramBot():
                 answer_message += f"Error : Site not detected for ticket {ticket_url}.\n"
                 continue
             # Add ticket to watch list
-            self.db_interface.execute(f"INSERT INTO tickets_url (url) VALUES ('{ticket_url}')")
+            self.db_interface.execute(f"INSERT INTO tickets_url (url) VALUES (?)", (ticket_url,))
             self.db_interface.commit()
             answer_message += f"Info : Ticket {ticket_url} added to watch list.\n"
         
@@ -249,7 +249,7 @@ class TelegramBot():
                 answer_message += f"Warning : Ticket {ticket_url} not in watch list.\n"
                 continue
             # Remove ticket from watch list
-            self.db_interface.execute(f"DELETE FROM tickets_url WHERE url = '{ticket_url}'")
+            self.db_interface.execute(f"DELETE FROM tickets_url WHERE url = ?", (ticket_url,))
             self.db_interface.commit()
             answer_message += f"Info : Ticket {ticket_url} removed from watch list.\n"
 

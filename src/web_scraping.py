@@ -64,12 +64,22 @@ class SeeTicketsSoldoutDetector(SoldoutDetector):
         return "SeeTickets"
     
     def is_soldout(self, url: str, driver: webdriver.Firefox):
-        return is_in_url_classes(
-            url=url,
-            element = ['checkout-button', 'lrg-btn', 'float-r', 'm-r-5'],
-            driver=driver,
-        )
+        
+        # Tag identifier method
+        return is_in_url_classes(url, ['changeMe', 'shipping'], driver)
 
+        # Text reading method
+        driver.get(url)
+        page_source = driver.page_source
+        for text_of_soldout_page in [
+            "Event is SOLD OUT",
+            "Tickets are not available",
+            "No recordsNo records",
+            "Tickets available at the box office",
+            ]:
+            if text_of_soldout_page in page_source:
+                return True
+        return False
 
 
 class EtixSoldoutDetector(SoldoutDetector):

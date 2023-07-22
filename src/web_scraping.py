@@ -66,7 +66,7 @@ class SeeTicketsSoldoutDetector(SoldoutDetector):
     def is_soldout(self, url: str, driver: webdriver.Firefox):
         
         # Tag identifier method
-        return is_in_url_classes(url, ['changeMe', 'shipping'], driver)
+        return not is_in_url_classes(url, ['changeMe', 'shipping'], driver)
 
         # Text reading method
         driver.get(url)

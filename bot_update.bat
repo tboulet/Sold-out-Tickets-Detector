@@ -1,1 +1,4 @@
-cmd /k git pull
+@echo off
+
+REM Update the code from GitHub
+git pull

@@ -30,6 +30,7 @@ command_signature_to_description : Dict[str, str] = {
     "/check <url1> <url2> ..." : "Check the availability of one or more tickets' urls",
     "/set <parameter name> <value>" : "Set a parameter to a new value",
     "/get <parameter name>" : "Get the value of a parameter",
+    "/remove <parameter name>" : "Remove a parameter",
     "/status" : "Get the status of the bot",
     "/reset_db" : "Delete the whole database (tickets and parameters) and recreate a new one",
     "/print <anything>" : "Print this command in the console",

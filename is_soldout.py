@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     else:
         print(f"Site detected : {detector.get_name()}")
-        if detector.is_soldout(url, driver):
+        if detector.is_soldout(url, driver, db_interface=None):
             print("Status : sold out")
         else:
             print("Status : available")

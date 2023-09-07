@@ -71,6 +71,7 @@ class TelegramBot():
         self.dispatcher.add_handler(CommandHandler("status", self.execute_status))
         self.dispatcher.add_handler(CommandHandler("set", self.execute_set))
         self.dispatcher.add_handler(CommandHandler("get", self.execute_get))
+        self.dispatcher.add_handler(CommandHandler("remove", self.execute_remove))
         self.dispatcher.add_handler(CommandHandler("reset_db", self.execute_reset_db))
         self.dispatcher.add_handler(CommandHandler("print", self.execute_print))
         self.dispatcher.add_handler(CommandHandler("stop", self.execute_stop))
@@ -114,7 +115,7 @@ class TelegramBot():
                     for ticket_url in tickets_urls:
                         try:
                             detector = url_to_detector(ticket_url)
-                            if detector.is_soldout(url=ticket_url, driver=self.driver):
+                            if detector.is_soldout(url=ticket_url, driver=self.driver, db_interface=self.db_interface):
                                 # Send message
                                 print(f"Ticket {ticket_url} is sold out !")
                                 self.updater.bot.send_message(chat_id=CHAT_ID, text=f"Ticket {ticket_url} is sold out !", disable_web_page_preview=True)
@@ -288,7 +289,7 @@ class TelegramBot():
             else:
                 ticket_line += f"Site : {detector.get_name()}, "
                 try:
-                    if detector.is_soldout(url=ticket_url, driver=self.driver):
+                    if detector.is_soldout(url=ticket_url, driver=self.driver, db_interface=self.db_interface):
                         # Case 2 : sold out
                         ticket_line += "Status : sold out."
                     else:
@@ -369,8 +370,8 @@ class TelegramBot():
         parameter_value_old = self.get_parameter_from_db(parameter_name)
         # Check if the parameter exist
         if parameter_value_old is None:
-            update.message.reply_text(f"Parameter {parameter_name} not found")
-            return
+            self.set_parameter_in_db(parameter_name, parameter_value)
+            update.message.reply_text(f"Parameter {parameter_name} initialized at {parameter_value}")
         # Check if the parameter already has the same value
         if parameter_value == parameter_value_old:
             update.message.reply_text(f"Parameter {parameter_name} value unchanged ({parameter_value})", disable_web_page_preview=True)
@@ -398,6 +399,28 @@ class TelegramBot():
             return
         # Return the parameter value
         update.message.reply_text(f"Parameter {parameter_name} value: {parameter_value}")
+
+
+
+    @command_execution_method
+    def execute_remove(self, update : Update, context : CallbackContext):
+        """Remove a parameter from the database."""
+        message_text = update.message.text
+        command_signature, *args = message_text.split()
+        if len(args) != 1:
+            update.message.reply_text("Error : Invalid number of arguments (should be exactly 1)", disable_web_page_preview=True)
+            return
+        
+        parameter_name = args[0]
+        parameter_value = self.get_parameter_from_db(parameter_name)
+        # Check if the parameter exist
+        if parameter_value is None:
+            update.message.reply_text(f"Parameter {parameter_name} not found", disable_web_page_preview=True)
+            return
+        # Remove the parameter
+        self.db_interface.execute(f"DELETE FROM parameters WHERE name = ?", (parameter_name,))
+        self.db_interface.commit()
+        update.message.reply_text(f"Parameter {parameter_name} removed from database.", disable_web_page_preview=True)
 
 
 

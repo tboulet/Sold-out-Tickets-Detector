@@ -1,11 +1,14 @@
 from abc import ABC, abstractmethod
-from typing import Any
+import ast
+from typing import Any, List
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from webdriver_manager.firefox import GeckoDriverManager
 import argparse
 from selenium.common.exceptions import NoSuchElementException
 from bs4 import BeautifulSoup
+
+from src.interface_database import DBInterface
 
 
 def get_driver():
@@ -33,7 +36,7 @@ class SoldoutDetector(ABC):
         """
         raise NotImplementedError("Please Implement this method")
     @abstractmethod
-    def is_soldout(self, url : str, driver : webdriver.Firefox):
+    def is_soldout(self, url : str, driver : webdriver.Firefox, db_interface : DBInterface):
         """Return True if the event is soldout, False otherwise
 
         Args:
@@ -47,9 +50,9 @@ class SoldoutDetector(ABC):
 class TicktwebSoldoutDetector(SoldoutDetector):
     
     def get_name(self):
-        return "TicketWeb"
+        return "ticketweb"
     
-    def is_soldout(self, url : str, driver : webdriver.Firefox):
+    def is_soldout(self, url : str, driver : webdriver.Firefox, db_interface : DBInterface):
         driver.get(url)
         try:
             driver.find_element(By.ID, "edp-section-tickets-heading")
@@ -61,10 +64,15 @@ class TicktwebSoldoutDetector(SoldoutDetector):
 
 class SeeTicketsSoldoutDetector(SoldoutDetector):
     def get_name(self):
-        return "SeeTickets"
+        return "seetickets"
     
-    def is_soldout(self, url: str, driver: webdriver.Firefox):
+    def is_soldout(self, url: str, driver: webdriver.Firefox, db_interface : DBInterface):
         
+        # From database tag identifier method
+        criteria_str : str = db_interface.get_parameter_from_db("seetickets_criteria")
+        criteria_list : List[str] = ast.literal_eval(criteria_str)
+        return not is_in_url_classes(url, element=criteria_list, driver=driver)
+
         # Tag identifier method
         return not is_in_url_classes(url, ['changeMe', 'shipping'], driver)
 
@@ -82,11 +90,12 @@ class SeeTicketsSoldoutDetector(SoldoutDetector):
         return False
 
 
+
 class EtixSoldoutDetector(SoldoutDetector):
     def get_name(self):
-        return "Etix"
+        return "etix"
     
-    def is_soldout(self, url : str, driver : webdriver.Firefox):
+    def is_soldout(self, url : str, driver : webdriver.Firefox, db_interface : DBInterface):
         driver.get(url)
         try:
             driver.find_element(By.ID, "normal-price-code")

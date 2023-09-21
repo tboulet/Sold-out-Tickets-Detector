@@ -4,10 +4,10 @@ REM Activate the virtual environment
 call venv\Scripts\activate
 
 REM Install required librairies
-pip install -r requirements.txt
+py -m pip install -r requirements.txt
 
 REM Execute the Python script
-python run.py
+py run.py
 timeout /t 5
 
 REM Deactivate the virtual environment
